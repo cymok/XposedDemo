@@ -1,8 +1,9 @@
 package cn.mozhx.xposeddemo;
 
-import android.app.Activity;
+import android.os.Bundle;
 import android.text.TextUtils;
-import android.widget.Toast;
+
+import java.lang.reflect.Method;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -10,63 +11,66 @@ import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+@SuppressWarnings("WeakerAccess")
 public class XposedHookLoadPackage implements IXposedHookLoadPackage {
     public static final String HOOK_PKG = "com.tencent.mm";
 
+    public static final String CLASS_NAME = "com.tencent.mm.app.WeChatSplashActivity";
+    public static final String METHOD_NAME = "onCreate";
+
     @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
+    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
         XposedBridge.log("handleLoadPackage:" + loadPackageParam.packageName);
         if (!TextUtils.equals(HOOK_PKG, loadPackageParam.packageName)) {
             return;
         }
 
-        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onCreate 开始hook");
+        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx 开始hook");
         XposedHelpers.findAndHookMethod(
-                HOOK_PKG + ".app.WeChatSplashActivity",
+                CLASS_NAME,
                 loadPackageParam.classLoader,
-                "onCreate",
-                android.os.Bundle.class,
+                METHOD_NAME,
+                Bundle.class,
                 new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onCreate beforeHookedMethod");
+                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx beforeHookedMethod");
                     }
 
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onCreate afterHookedMethod");
+                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx afterHookedMethod");
 
-                        Activity activity = (Activity) param.thisObject;
-                        activity.setContentView(R.layout.qy);
+                        Class<?> aClass = loadPackageParam.classLoader.loadClass(CLASS_NAME);
+                        Method setContentView = aClass.getMethod("setContentView", int.class);
+                        setContentView.invoke(aClass, R.layout.qy);
 
-                        Toast.makeText(activity, "onCreate 执行了", Toast.LENGTH_SHORT).show();
-
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onCreate done");
+                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx done");
                     }
                 });
 
-        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onStart 开始hook");
-        XposedHelpers.findAndHookMethod(
-                HOOK_PKG + ".app.WeChatSplashActivity",
-                loadPackageParam.classLoader,
-                "onStart",
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onStart beforeHookedMethod");
-                    }
-
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onStart afterHookedMethod");
-
-                        Activity activity = (Activity) param.thisObject;
-                        activity.setContentView(R.layout.qy);
-
-                        Toast.makeText(activity, "onStart 执行了", Toast.LENGTH_SHORT).show();
-
-                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx onStart done");
-                    }
-                });
+//        XposedBridge.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+//        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx 开始hook");
+//        XposedHelpers.findAndHookMethod(
+//                CLASS_NAME,
+//                loadPackageParam.classLoader,
+//                METHOD_NAME,
+//                Bundle.class,
+//                new XC_MethodHook() {
+//                    @Override
+//                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+//                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx beforeHookedMethod");
+//                    }
+//
+//                    @Override
+//                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+//                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx afterHookedMethod");
+//
+//                        Activity activity = (Activity) param.thisObject;
+//                        activity.setContentView(R.layout.qy);
+//
+//                        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx done");
+//                    }
+//                });
     }
 }
