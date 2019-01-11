@@ -1,0 +1,25 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "cn.mozhx.xposeddemo"
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0" + " T" + new Date().format("yyyyMMdd HH:mm:ss")
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+//    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //https://github.com/rovo89/XposedBridge/wiki/Using-the-Xposed-Framework-API
+//    implementation fileTree(include: ['*.jar'], dir: 'xplibs')
+    compileOnly 'de.robv.android.xposed:api:82'
+}
