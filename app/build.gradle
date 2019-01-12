@@ -1,18 +1,39 @@
 apply plugin: 'com.android.application'
 
+def cmdGitCommitId = 'git rev-parse --short HEAD'
+def gitCommitId = cmdGitCommitId.execute().text.trim()
+
+def timeStr = new Date().format("MMdd_HHmm")
+def name = '"' + app_name + '_' + timeStr + '"'
+
 android {
     compileSdkVersion 28
     defaultConfig {
+
+        buildConfigField 'String', 'APP_NAME', name
+
+        //自定义资源
+        resValue "string", "app_name", name
+
+        //占位符赋值
+        manifestPlaceholders = ["APP_NAME": timeStr]
+
         applicationId "cn.mozhx.xposeddemo"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
-        versionName "1.0" + " T" + new Date().format("yyyyMMdd HH:mm:ss")
+        versionName "1.0" + "_" + timeStr
     }
     buildTypes {
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                outputFileName = app_name + '-' + timeStr + '-' + variant.buildType.name + '.apk'
+            }
         }
     }
 }

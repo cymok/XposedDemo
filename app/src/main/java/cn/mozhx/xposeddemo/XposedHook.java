@@ -16,38 +16,38 @@ public class XposedHook implements IXposedHookLoadPackage {
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
-        String HOOK_PKG = "com.tencent.mm";
-        String CLASS_NAME = "com.tencent.mm.ui.SplashImageView";
+        String hookPkg = "com.tencent.mm";
+        String className = "com.tencent.mm.ui.SplashImageView";
 
         XposedBridge.log("handleLoadPackage:" + loadPackageParam.packageName);
-        if (!TextUtils.equals(HOOK_PKG, loadPackageParam.packageName)) {
+        if (!TextUtils.equals(hookPkg, loadPackageParam.packageName)) {
             return;
         }
 
-        XposedBridge.log("xxxxxxxxxxxxxxxxxxxx hook start");
         XC_MethodHook callback = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
-                XposedBridge.log("xxxxxxxxxxxxxxxxxxxx hook prepare");
+                XposedBridge.log("xxxxxxxxxxxxxxxxxxxx beforeHookedMethod");
             }
 
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
+                XposedBridge.log("xxxxxxxxxxxxxxxxxxxx afterHookedMethod");
                 ImageView imageView = (ImageView) param.thisObject;
                 imageView.setImageResource(R.drawable.qy);
                 XposedBridge.log("xxxxxxxxxxxxxxxxxxxx finish");
             }
         };
         //Context paramContext, AttributeSet paramAttributeSet, int paramInt
-        XposedHelpers.findAndHookConstructor(CLASS_NAME, loadPackageParam.classLoader,
+        XposedHelpers.findAndHookConstructor(className, loadPackageParam.classLoader,
                 Context.class,
                 callback);
-        XposedHelpers.findAndHookConstructor(CLASS_NAME, loadPackageParam.classLoader,
+        XposedHelpers.findAndHookConstructor(className, loadPackageParam.classLoader,
                 Context.class, AttributeSet.class,
                 callback);
-        XposedHelpers.findAndHookConstructor(CLASS_NAME, loadPackageParam.classLoader,
+        XposedHelpers.findAndHookConstructor(className, loadPackageParam.classLoader,
                 Context.class, AttributeSet.class, int.class,
                 callback);
 

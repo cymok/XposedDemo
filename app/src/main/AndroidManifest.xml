@@ -15,7 +15,7 @@
             android:value="true"/>
         <meta-data
             android:name="xposeddescription"
-            android:value="微信启动页"/>
+            android:value="${APP_NAME}"/>
         <meta-data
             android:name="xposedminversion"
             android:value="82"/>
